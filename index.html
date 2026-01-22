@@ -11,17 +11,32 @@
         #app-loader {
             position: fixed; inset: 0; display: flex; flex-direction: column;
             align-items: center; justify-content: center; background: #020617; z-index: 1000;
+            transition: opacity 0.5s ease-out;
         }
         .spinner {
             width: 40px; height: 40px; border: 4px solid #1e293b;
             border-top: 4px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #error-msg {
+            margin-top: 1.5rem; color: #ef4444; font-size: 0.75rem; font-weight: bold; 
+            max-width: 250px; text-align: center; display: none;
+        }
     </style>
     
     <script>
-        // Define process.env para evitar erros de referência no navegador
-        window.process = { env: { API_KEY: "" } };
+        // Mock global de process para compatibilidade com bibliotecas Node-like
+        window.process = window.process || { env: { API_KEY: "" } };
+        
+        // Captura erros globais para diagnóstico
+        window.onerror = function(msg, url, line) {
+            console.error("Erro Global:", msg, "em", url, ":", line);
+            const errDiv = document.getElementById('error-msg');
+            if (errDiv) {
+                errDiv.style.display = 'block';
+                errDiv.textContent = "Erro crítico ao carregar módulos. Verifique o console.";
+            }
+        };
     </script>
 
     <script type="importmap">
@@ -40,32 +55,40 @@
 <body class="bg-slate-950 text-slate-100">
     <div id="app-loader">
         <div class="spinner"></div>
-        <p style="margin-top: 1rem; color: #94a3b8; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;">Carregando BarberFlow...</p>
+        <p style="margin-top: 1rem; color: #94a3b8; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;">Iniciando BarberFlow...</p>
+        <div id="error-msg"></div>
     </div>
     
     <div id="root"></div>
 
+    <!-- Ponto de entrada crucial para a aplicação rodar -->
+    <script type="module" src="index.tsx"></script>
+
     <script>
-        // Remove o loader assim que o React renderizar o primeiro elemento
-        const observer = new MutationObserver(() => {
+        // Monitora quando o React terminar de montar o HTML
+        const startTime = Date.now();
+        const checkInterval = setInterval(() => {
             const root = document.getElementById('root');
-            if (root && root.children.length > 0) {
-                const loader = document.getElementById('app-loader');
-                if (loader) loader.style.display = 'none';
-                observer.disconnect();
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-        
-        // Fallback de erro: se em 10s não carregar, avisa o usuário
-        setTimeout(() => {
             const loader = document.getElementById('app-loader');
-            if (loader && loader.style.display !== 'none') {
-                const p = loader.querySelector('p');
-                if (p) p.innerHTML = "Erro ao iniciar. Por favor, atualize a página.";
-                if (p) p.style.color = "#ef4444";
+            
+            if (root && root.children.length > 0) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+                clearInterval(checkInterval);
             }
-        }, 10000);
+            
+            // Timeout de segurança: 12 segundos
+            if (Date.now() - startTime > 12000) {
+                const p = loader.querySelector('p');
+                const err = document.getElementById('error-msg');
+                if (p) p.style.display = 'none';
+                if (err) {
+                    err.style.display = 'block';
+                    err.innerHTML = "O sistema está demorando para iniciar.<br><br>Por favor, limpe o cache e atualize a página.";
+                }
+                clearInterval(checkInterval);
+            }
+        }, 200);
     </script>
 </body>
 </html>
