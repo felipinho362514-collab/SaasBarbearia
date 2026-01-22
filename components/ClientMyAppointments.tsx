@@ -58,7 +58,7 @@ const ClientMyAppointments: React.FC<ClientMyAppointmentsProps> = ({ appointment
                     <div className="space-y-4">
                       <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Seu Profissional</h4>
                       <div className="flex items-center gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
-                        <img src={barber?.avatar} className="w-12 h-12 rounded-full border-2 border-amber-500" alt="" />
+                        <img src={barber?.avatar} className="w-12 h-12 rounded-full border-2 border-amber-500 object-cover" alt="" />
                         <div>
                           <div className="font-black text-white">{barber?.name}</div>
                           <div className="text-[10px] text-slate-500 font-bold uppercase">{barber?.operatingDays}</div>
@@ -68,26 +68,36 @@ const ClientMyAppointments: React.FC<ClientMyAppointmentsProps> = ({ appointment
                         href={`https://wa.me/${barber?.phone}`} 
                         target="_blank" 
                         rel="noreferrer"
-                        className="flex items-center justify-center gap-3 w-full bg-green-500 text-slate-950 font-black py-3 rounded-xl hover:bg-green-400 transition-all text-xs uppercase tracking-widest"
+                        className="flex items-center justify-center gap-3 w-full bg-green-500 text-slate-950 font-black py-4 rounded-xl hover:bg-green-400 transition-all text-xs uppercase tracking-widest shadow-lg shadow-green-500/10"
                       >
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.319 1.592 5.548 0 10.058-4.51 10.06-10.059.002-2.689-1.047-5.215-2.951-7.121C17.175 2.699 14.653 1.65 11.963 1.65c-5.549 0-10.059 4.51-10.06 10.06-.001 2.125.61 4.202 1.768 5.89l-.999 3.646 3.743-.982-.361-.221z"/></svg>
-                        Falar no WhatsApp
+                        WhatsApp Barbeiro
                       </a>
                     </div>
 
-                    {/* Coluna da Unidade */}
+                    {/* Coluna da Unidade / Menu de Informações */}
                     <div className="space-y-4">
                       <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Onde Estamos</h4>
-                      <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+                      <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-4">
                          <div className="flex gap-3">
-                            <svg className="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                            <span className="text-xs text-slate-300 font-bold leading-relaxed">{barber?.address}</span>
+                            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+                               <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            </div>
+                            <div className="space-y-1">
+                               <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Endereço</span>
+                               <p className="text-xs text-slate-300 font-bold leading-relaxed">{barber?.address}</p>
+                            </div>
                          </div>
-                         <div className="flex gap-3 border-t border-slate-900 pt-3">
-                            <svg className="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">
-                               {barber?.workingHours.start} às {barber?.workingHours.end}
-                            </span>
+                         <div className="flex gap-3 border-t border-slate-900 pt-4">
+                            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+                               <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </div>
+                            <div className="space-y-1">
+                               <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Horário de Funcionamento</span>
+                               <p className="text-xs text-slate-300 font-bold">
+                                  {barber?.workingHours.start} às {barber?.workingHours.end} • {barber?.operatingDays}
+                               </p>
+                            </div>
                          </div>
                       </div>
                     </div>
@@ -103,12 +113,15 @@ const ClientMyAppointments: React.FC<ClientMyAppointmentsProps> = ({ appointment
                 </div>
 
                 <div className="bg-slate-950/80 p-6 flex justify-between items-center">
-                  <div className="text-lg font-black text-white">R$ {totalPrice}</div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Valor:</span>
+                    <div className="text-lg font-black text-white">R$ {totalPrice}</div>
+                  </div>
                   <button 
                     onClick={() => onCancel(app.id)}
-                    className="text-[10px] font-black text-red-500/50 hover:text-red-500 uppercase tracking-[0.2em] transition-all"
+                    className="text-[10px] font-black text-red-500/50 hover:text-red-500 uppercase tracking-[0.2em] transition-all hover:scale-105"
                   >
-                    Cancelar Agendamento
+                    Desmarcar
                   </button>
                 </div>
               </div>
@@ -118,7 +131,7 @@ const ClientMyAppointments: React.FC<ClientMyAppointmentsProps> = ({ appointment
       )}
       
       <div className="pt-10 text-center">
-         <p className="text-slate-600 text-xs font-bold uppercase tracking-widest">BarberFlow Pro © 2026 - Tecnologia e Estilo</p>
+         <p className="text-slate-600 text-[10px] font-black uppercase tracking-[0.3em]">BarberFlow Pro © 2026</p>
       </div>
     </div>
   );

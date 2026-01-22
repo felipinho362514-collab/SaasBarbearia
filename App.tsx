@@ -1,13 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
-import ClientBooking from './components/ClientBooking';
-import ClientMyAppointments from './components/ClientMyAppointments';
+import ClientHub from './components/ClientHub';
 import AdminDashboard from './components/AdminDashboard';
 import { Appointment, AppointmentStatus } from './types';
 
 const App: React.FC = () => {
-  const [view, setView] = useState<'portal' | 'client' | 'admin' | 'admin-login' | 'client-my-appointments'>('portal');
+  const [view, setView] = useState<'portal' | 'client' | 'admin' | 'admin-login'>('portal');
   const [pin, setPin] = useState('');
   const [loginError, setLoginError] = useState(false);
   const [appointments, setAppointments] = useState<Appointment[]>(() => {
@@ -130,7 +129,7 @@ const App: React.FC = () => {
                 <svg className="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
               </div>
               <h3 className="text-2xl font-black text-slate-100 mb-2 uppercase tracking-tight">Agendar Horário</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mt-auto">Marque seu próximo corte com nossos especialistas em poucos segundos.</p>
+              <p className="text-slate-400 text-sm leading-relaxed mt-auto">Marque seu próximo corte ou consulte suas reservas anteriores.</p>
             </button>
 
             <button 
@@ -179,18 +178,10 @@ const App: React.FC = () => {
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center font-black text-slate-950 shadow-lg shadow-amber-500/20">B</div>
                 <span className="font-black text-lg tracking-tighter bg-gradient-to-r from-amber-200 to-amber-500 bg-clip-text text-transparent uppercase whitespace-nowrap">
-                  {view === 'client' ? 'Agendamento' : view === 'client-my-appointments' ? 'Meus Horários' : 'Painel Gestão'}
+                  {view === 'client' ? 'Agendamento' : 'Painel Gestão'}
                 </span>
               </div>
               <div className="flex items-center gap-4">
-                 {view === 'client' && (
-                    <button 
-                      onClick={() => setView('client-my-appointments')}
-                      className="text-[10px] font-black uppercase text-amber-500 border border-amber-500/20 bg-amber-500/5 px-4 py-2 rounded-xl hover:bg-amber-500 hover:text-slate-950 transition-all tracking-widest"
-                    >
-                      Meus Agendamentos
-                    </button>
-                 )}
                  {view === 'admin' && (
                     <div className="hidden md:block bg-amber-500/5 border border-amber-500/20 px-4 py-1.5 rounded-full">
                       <span className="text-[10px] font-black uppercase text-amber-500 tracking-widest italic">{aiTip}</span>
@@ -201,8 +192,13 @@ const App: React.FC = () => {
           </nav>
           <main className="max-w-7xl mx-auto px-4 py-12">
             <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-              {view === 'client' && <ClientBooking onBook={handleBook} existingAppointments={appointments} onGoToMyAppointments={() => setView('client-my-appointments')} />}
-              {view === 'client-my-appointments' && <ClientMyAppointments appointments={appointments} onCancel={(id) => setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: AppointmentStatus.CANCELLED } : a))} />}
+              {view === 'client' && (
+                <ClientHub 
+                  onBook={handleBook} 
+                  appointments={appointments} 
+                  onCancel={(id) => handleUpdateStatus(id, AppointmentStatus.CANCELLED)}
+                />
+              )}
               {view === 'admin' && <AdminDashboard appointments={appointments} onUpdateStatus={handleUpdateStatus} />}
             </div>
           </main>
