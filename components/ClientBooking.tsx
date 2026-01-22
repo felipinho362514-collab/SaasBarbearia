@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { BARBERS, SERVICES } from '../constants';
 import { calculateAvailableSlots } from '../services/bookingService';
 import { Barber, Service, TimeSlot, Appointment, AppointmentStatus } from '../types';
@@ -26,15 +26,25 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   
-  // Como estamos logados, usamos os dados do login
   const firstName = prefillName.split(' ')[0];
-  const lastName = prefillName.split(' ').slice(1).join(' ');
   const phone = prefillPhone;
 
+  // Gerar os dias da semana atual (Próximos 7 dias)
+  const weekDays = useMemo(() => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      const isoDate = date.toISOString().split('T')[0];
+      const dayName = date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
+      const dayNumber = date.getDate();
+      const isToday = i === 0;
+      days.push({ isoDate, dayName, dayNumber, isToday });
+    }
+    return days;
+  }, []);
+
   useEffect(() => {
-    // Aqui passamos todos os agendamentos do sistema para o serviço de cálculo (que deve estar no App para ser global)
-    // Para simplificar no demo, o ClientHub já passa os agendamentos filtrados, mas para disponibilidade real, precisamos dos globais.
-    // Como este é um sistema local, vamos assumir que o cálculo é feito sobre a base de dados.
     const slots = calculateAvailableSlots(selectedDate, selectedBarber, existingAppointments);
     setAvailableSlots(slots);
     setSelectedTime(null);
@@ -80,7 +90,7 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
       <div className="flex justify-between items-end mb-10 border-b border-slate-900 pb-6">
         <div>
            <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Reserve seu Estilo</h2>
-           <p className="text-slate-500 text-sm mt-1">Olá, <strong>{firstName}</strong>. Escolha o melhor horário para você.</p>
+           <p className="text-slate-500 text-sm mt-1">Olá, <strong>{firstName}</strong>. Escolha o melhor dia e horário.</p>
         </div>
         <button 
            onClick={onGoToMyAppointments}
@@ -170,38 +180,59 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
         <div className="space-y-8">
           <section className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
             <h3 className="text-sm font-black text-amber-500 uppercase tracking-[0.2em] mb-6">03. Quando?</h3>
-            <input 
-              type="date" 
-              value={selectedDate}
-              min={new Date().toISOString().split('T')[0]}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-slate-100 mb-6 outline-none focus:border-amber-500 transition-all font-bold"
-            />
             
-            <div className="grid grid-cols-3 gap-2">
-              {availableSlots.map(slot => (
+            {/* Calendário Semanal Visual */}
+            <div className="flex gap-3 overflow-x-auto pb-4 mb-6 no-scrollbar snap-x">
+              {weekDays.map((day) => (
                 <button
-                  key={slot.time}
-                  disabled={!slot.available}
-                  onClick={() => setSelectedTime(slot.time)}
-                  className={`py-3 rounded-xl text-xs font-black transition-all ${
-                    !slot.available 
-                    ? 'bg-slate-900 text-slate-700 opacity-40 cursor-not-allowed' 
-                    : selectedTime === slot.time
-                    ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
-                    : 'bg-slate-950 text-slate-400 border border-slate-800 hover:border-slate-600'
+                  key={day.isoDate}
+                  onClick={() => setSelectedDate(day.isoDate)}
+                  className={`flex flex-col items-center justify-center min-w-[70px] py-4 rounded-2xl border-2 transition-all snap-start ${
+                    selectedDate === day.isoDate
+                      ? 'bg-amber-500 border-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
+                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-600'
                   }`}
                 >
-                  {slot.time}
+                  <span className={`text-[10px] font-black uppercase tracking-widest mb-1 ${
+                    selectedDate === day.isoDate ? 'text-slate-900/70' : 'text-slate-500'
+                  }`}>
+                    {day.isToday ? 'Hoje' : day.dayName}
+                  </span>
+                  <span className="text-xl font-black">{day.dayNumber}</span>
                 </button>
               ))}
+            </div>
+            
+            <div className="grid grid-cols-3 gap-2 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
+              {availableSlots.length > 0 ? (
+                availableSlots.map(slot => (
+                  <button
+                    key={slot.time}
+                    disabled={!slot.available}
+                    onClick={() => setSelectedTime(slot.time)}
+                    className={`py-3 rounded-xl text-xs font-black transition-all ${
+                      !slot.available 
+                      ? 'bg-slate-900 text-slate-700 opacity-40 cursor-not-allowed' 
+                      : selectedTime === slot.time
+                      ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
+                      : 'bg-slate-950 text-slate-400 border border-slate-800 hover:border-slate-600'
+                    }`}
+                  >
+                    {slot.time}
+                  </button>
+                ))
+              ) : (
+                <div className="col-span-3 text-center py-8">
+                  <p className="text-slate-500 text-xs font-bold uppercase tracking-widest italic">Nenhum horário disponível</p>
+                </div>
+              )}
             </div>
           </section>
 
           <section className="bg-amber-500 p-8 rounded-[2.5rem] shadow-2xl shadow-amber-500/20 text-slate-950">
             <div className="flex justify-between items-center mb-6">
               <div className="space-y-1">
-                 <p className="text-[10px] font-black uppercase opacity-60">Perfil Identificado</p>
+                 <p className="text-[10px] font-black uppercase opacity-60">Resumo do Perfil</p>
                  <p className="font-black text-xs">{phone}</p>
               </div>
               <div className="text-right">
@@ -214,11 +245,19 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
               onClick={handleBooking}
               className="w-full py-4 bg-slate-950 text-amber-500 hover:bg-slate-900 disabled:bg-slate-950/50 disabled:text-slate-700 font-black rounded-2xl transition-all uppercase tracking-[0.2em] text-sm shadow-xl"
             >
-              {isFormValid ? 'Confirmar Reserva' : 'Selecione um horário'}
+              {isFormValid ? 'Confirmar Reserva' : 'Escolha Dia e Hora'}
             </button>
           </section>
         </div>
       </div>
+      
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+      `}</style>
     </div>
   );
 };
