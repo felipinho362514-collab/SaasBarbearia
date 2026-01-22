@@ -86,61 +86,61 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
   const isFormValid = selectedTime && selectedServices.length > 0;
 
   return (
-    <div className="max-w-4xl mx-auto relative">
-      <div className="flex justify-between items-end mb-10 border-b border-slate-900 pb-6">
+    <div className="max-w-4xl mx-auto relative px-2">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 border-b border-slate-900 pb-6 gap-4">
         <div>
-           <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Reserve seu Estilo</h2>
-           <p className="text-slate-500 text-sm mt-1">Olá, <strong>{firstName}</strong>. Escolha o melhor dia e horário.</p>
+           <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter">Agendar Horário</h2>
+           <p className="text-slate-500 text-sm mt-1">Olá, <strong>{firstName}</strong>. Escolha os serviços e o dia.</p>
         </div>
         <button 
            onClick={onGoToMyAppointments}
-           className="hidden md:flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 hover:text-amber-500 transition-colors tracking-widest"
+           className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 hover:text-amber-500 transition-colors tracking-widest bg-slate-900 px-4 py-2 rounded-full border border-slate-800 md:bg-transparent md:border-0 md:p-0"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-          Ver minhas reservas
+          Minhas Reservas
         </button>
       </div>
 
       {showSuccess && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 animate-in fade-in duration-300">
-          <div className="bg-slate-900 border border-amber-500/50 p-10 rounded-[2.5rem] text-center max-w-md shadow-2xl shadow-amber-500/20 animate-in zoom-in duration-500">
-            <div className="w-24 h-24 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg shadow-amber-500/40">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/95 backdrop-blur-xl p-4 animate-in fade-in duration-500">
+          <div className="bg-slate-900 border border-amber-500/30 p-8 md:p-12 rounded-[3rem] text-center max-w-sm w-full shadow-2xl animate-in zoom-in duration-500">
+            <div className="w-20 h-20 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-amber-500/20">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-3xl font-black text-white mb-4 uppercase tracking-tighter">Agendado!</h2>
-            <p className="text-slate-400 mb-8 font-medium">Sua reserva foi confirmada para <strong>{firstName}</strong>. Vejo você em breve!</p>
+            <h2 className="text-2xl font-black text-white mb-3 uppercase tracking-tighter">Reservado!</h2>
+            <p className="text-slate-400 mb-8 text-sm font-medium leading-relaxed">Tudo certo, <strong>{firstName}</strong>! Te esperamos na barbearia no horário marcado.</p>
             <button 
               onClick={() => setShowSuccess(false)}
-              className="w-full bg-amber-500 text-slate-950 font-black py-4 rounded-2xl hover:bg-amber-400 transition-all uppercase tracking-widest text-sm"
+              className="w-full bg-amber-500 text-slate-950 font-black py-4 rounded-2xl hover:bg-amber-400 transition-all uppercase tracking-widest text-xs"
             >
-              Excelente
+              Entendido
             </button>
           </div>
         </div>
       )}
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-8">
-          <section className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
-            <h3 className="text-sm font-black text-amber-500 uppercase tracking-[0.2em] mb-6">01. Escolha o Profissional</h3>
-            <div className="flex gap-4">
+          <section className="bg-slate-900/50 p-5 md:p-6 rounded-[2rem] border border-slate-800">
+            <h3 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em] mb-6">01. O Profissional</h3>
+            <div className="flex gap-3">
               {BARBERS.map(barber => (
                 <button
                   key={barber.id}
                   onClick={() => setSelectedBarber(barber)}
                   className={`flex-1 group relative p-4 rounded-2xl border-2 transition-all ${
                     selectedBarber.id === barber.id 
-                    ? 'border-amber-500 bg-amber-500/5' 
-                    : 'border-slate-800 hover:border-slate-700 bg-slate-950'
+                    ? 'border-amber-500 bg-amber-500/5 shadow-lg shadow-amber-500/5' 
+                    : 'border-slate-800 bg-slate-950'
                   }`}
                 >
-                  <img src={barber.avatar} className="w-16 h-16 rounded-full mx-auto mb-3 object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
-                  <div className="text-xs font-bold text-slate-200 text-center">{barber.name.split(' ')[0]}</div>
+                  <img src={barber.avatar} className="w-14 h-14 rounded-full mx-auto mb-3 object-cover border-2 border-slate-800 group-hover:border-amber-500/50 transition-all" alt="" />
+                  <div className="text-[10px] font-black text-slate-200 text-center uppercase tracking-widest">{barber.name.split(' ')[0]}</div>
                   {selectedBarber.id === barber.id && (
-                    <div className="absolute top-2 right-2 w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center">
-                      <svg className="w-2 h-2 text-slate-950" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center border-4 border-slate-900 shadow-lg">
+                      <svg className="w-2.5 h-2.5 text-slate-950" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
                     </div>
                   )}
                 </button>
@@ -148,9 +148,9 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
             </div>
           </section>
 
-          <section className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
-            <h3 className="text-sm font-black text-amber-500 uppercase tracking-[0.2em] mb-6">02. Selecione os Serviços</h3>
-            <div className="grid gap-4">
+          <section className="bg-slate-900/50 p-5 md:p-6 rounded-[2rem] border border-slate-800">
+            <h3 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em] mb-6">02. Serviços</h3>
+            <div className="grid gap-3">
               {SERVICES.map(service => (
                 <div 
                   key={service.id}
@@ -158,18 +158,18 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
                   className={`group relative flex overflow-hidden rounded-2xl border-2 cursor-pointer transition-all ${
                     selectedServices.includes(service.id) 
                     ? 'border-amber-500 bg-amber-500/5' 
-                    : 'border-slate-800 hover:border-slate-700 bg-slate-950'
+                    : 'border-slate-800 bg-slate-950'
                   }`}
                 >
-                  <div className="w-24 h-24 overflow-hidden shrink-0">
-                    <img src={service.image} className="w-full h-full object-cover transition-transform group-hover:scale-110" alt="" />
+                  <div className="w-20 h-20 md:w-24 md:h-24 overflow-hidden shrink-0">
+                    <img src={service.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
                   </div>
                   <div className="p-4 flex-1 flex flex-col justify-center">
-                    <div className="flex justify-between items-start mb-1">
-                      <span className="font-bold text-slate-100">{service.name}</span>
-                      <span className="text-amber-500 font-black text-sm">R$ {service.price}</span>
+                    <div className="flex justify-between items-start">
+                      <span className="font-black text-slate-100 text-sm md:text-base uppercase tracking-tight">{service.name}</span>
+                      <span className="text-amber-500 font-black text-xs md:text-sm">R$ {service.price}</span>
                     </div>
-                    <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{service.durationMinutes} min • {service.description}</p>
+                    <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">{service.durationMinutes} min • {service.description}</p>
                   </div>
                 </div>
               ))}
@@ -178,43 +178,43 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
         </div>
 
         <div className="space-y-8">
-          <section className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
-            <h3 className="text-sm font-black text-amber-500 uppercase tracking-[0.2em] mb-6">03. Quando?</h3>
+          <section className="bg-slate-900/50 p-5 md:p-6 rounded-[2rem] border border-slate-800">
+            <h3 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em] mb-6">03. Escolha o Dia</h3>
             
-            {/* Calendário Semanal Visual */}
-            <div className="flex gap-3 overflow-x-auto pb-4 mb-6 no-scrollbar snap-x">
+            <div className="flex gap-3 overflow-x-auto pb-6 no-scrollbar snap-x">
               {weekDays.map((day) => (
                 <button
                   key={day.isoDate}
                   onClick={() => setSelectedDate(day.isoDate)}
-                  className={`flex flex-col items-center justify-center min-w-[70px] py-4 rounded-2xl border-2 transition-all snap-start ${
+                  className={`flex flex-col items-center justify-center min-w-[75px] py-5 rounded-2xl border-2 transition-all snap-center ${
                     selectedDate === day.isoDate
-                      ? 'bg-amber-500 border-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-600'
+                      ? 'bg-amber-500 border-amber-500 text-slate-950 shadow-xl shadow-amber-500/20'
+                      : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700'
                   }`}
                 >
-                  <span className={`text-[10px] font-black uppercase tracking-widest mb-1 ${
-                    selectedDate === day.isoDate ? 'text-slate-900/70' : 'text-slate-500'
+                  <span className={`text-[9px] font-black uppercase tracking-widest mb-1 ${
+                    selectedDate === day.isoDate ? 'text-slate-950/60' : 'text-slate-600'
                   }`}>
                     {day.isToday ? 'Hoje' : day.dayName}
                   </span>
-                  <span className="text-xl font-black">{day.dayNumber}</span>
+                  <span className="text-2xl font-black">{day.dayNumber}</span>
                 </button>
               ))}
             </div>
             
-            <div className="grid grid-cols-3 gap-2 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
+            <h3 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em] mb-6">04. Horário Disponível</h3>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 gap-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
               {availableSlots.length > 0 ? (
                 availableSlots.map(slot => (
                   <button
                     key={slot.time}
                     disabled={!slot.available}
                     onClick={() => setSelectedTime(slot.time)}
-                    className={`py-3 rounded-xl text-xs font-black transition-all ${
+                    className={`py-4 rounded-xl text-[11px] font-black transition-all ${
                       !slot.available 
-                      ? 'bg-slate-900 text-slate-700 opacity-40 cursor-not-allowed' 
+                      ? 'bg-slate-900 text-slate-800 cursor-not-allowed border border-transparent' 
                       : selectedTime === slot.time
-                      ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
+                      ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20 border-amber-500'
                       : 'bg-slate-950 text-slate-400 border border-slate-800 hover:border-slate-600'
                     }`}
                   >
@@ -222,30 +222,30 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
                   </button>
                 ))
               ) : (
-                <div className="col-span-3 text-center py-8">
-                  <p className="text-slate-500 text-xs font-bold uppercase tracking-widest italic">Nenhum horário disponível</p>
+                <div className="col-span-full text-center py-10">
+                  <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest italic">Barbearia fechada neste dia</p>
                 </div>
               )}
             </div>
           </section>
 
-          <section className="bg-amber-500 p-8 rounded-[2.5rem] shadow-2xl shadow-amber-500/20 text-slate-950">
+          <section className="bg-amber-500 p-6 md:p-8 rounded-[2.5rem] shadow-2xl shadow-amber-500/10 text-slate-950 sticky bottom-4">
             <div className="flex justify-between items-center mb-6">
-              <div className="space-y-1">
-                 <p className="text-[10px] font-black uppercase opacity-60">Resumo do Perfil</p>
-                 <p className="font-black text-xs">{phone}</p>
+              <div className="space-y-0.5">
+                 <p className="text-[9px] font-black uppercase opacity-60 tracking-widest">Resumo do Corte</p>
+                 <p className="font-black text-xs md:text-sm">{selectedServices.length} serviço(s)</p>
               </div>
               <div className="text-right">
-                <span className="uppercase tracking-widest text-[10px] font-black opacity-60">Total</span>
-                <p className="text-2xl font-black leading-none">R$ {totalPrice}</p>
+                <span className="uppercase tracking-widest text-[9px] font-black opacity-60">Valor total</span>
+                <p className="text-2xl md:text-3xl font-black leading-none">R$ {totalPrice}</p>
               </div>
             </div>
             <button
               disabled={!isFormValid}
               onClick={handleBooking}
-              className="w-full py-4 bg-slate-950 text-amber-500 hover:bg-slate-900 disabled:bg-slate-950/50 disabled:text-slate-700 font-black rounded-2xl transition-all uppercase tracking-[0.2em] text-sm shadow-xl"
+              className="w-full py-5 bg-slate-950 text-amber-500 hover:bg-slate-900 disabled:bg-slate-950/40 disabled:text-slate-800 font-black rounded-2xl transition-all uppercase tracking-[0.2em] text-xs shadow-xl active:scale-95"
             >
-              {isFormValid ? 'Confirmar Reserva' : 'Escolha Dia e Hora'}
+              {isFormValid ? 'Finalizar Reserva' : 'Escolha os detalhes'}
             </button>
           </section>
         </div>

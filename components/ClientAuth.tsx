@@ -15,13 +15,13 @@ const ClientAuth: React.FC<ClientAuthProps> = ({ onLogin, existingPhones }) => {
     e.preventDefault();
     if (phone.length < 10) return;
 
-    // Simula verificação se o telefone já existe no sistema
-    const isReturning = existingPhones.includes(phone) || localStorage.getItem(`client_name_${phone}`);
+    // Verifica se já existe um nome para este telefone no localStorage
+    const savedName = localStorage.getItem(`client_name_${phone}`);
     
-    if (isReturning) {
-      const savedName = localStorage.getItem(`client_name_${phone}`) || "Cliente";
+    if (savedName && savedName.trim().length >= 3) {
       onLogin({ name: savedName, phone });
     } else {
+      // Se não houver nome, obriga o registro
       setStep('register');
     }
   };
@@ -30,68 +30,72 @@ const ClientAuth: React.FC<ClientAuthProps> = ({ onLogin, existingPhones }) => {
     e.preventDefault();
     if (name.trim().length < 3) return;
     
-    localStorage.setItem(`client_name_${phone}`, name);
-    onLogin({ name, phone });
+    // Salva e loga
+    localStorage.setItem(`client_name_${phone}`, name.trim());
+    onLogin({ name: name.trim(), phone });
   };
 
   return (
-    <div className="min-h-[60vh] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 p-8 rounded-[2.5rem] shadow-2xl animate-in zoom-in duration-300">
-        <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+    <div className="min-h-[70vh] flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800 p-6 md:p-10 rounded-[2.5rem] shadow-2xl animate-in zoom-in slide-in-from-bottom-10 duration-500">
+        <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-inner">
           <svg className="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         </div>
 
         {step === 'phone' ? (
           <form onSubmit={handleNext} className="text-center">
-            <h2 className="text-2xl font-black text-white uppercase tracking-tighter mb-2">Acesse sua Agenda</h2>
-            <p className="text-slate-500 text-sm mb-8">Digite seu WhatsApp para ver seus horários e marcar novos serviços.</p>
+            <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter mb-3">Identifique-se</h2>
+            <p className="text-slate-500 text-sm mb-8 px-4">Para sua segurança e privacidade, digite seu WhatsApp.</p>
             
-            <div className="space-y-4">
-              <input 
-                type="tel"
-                required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                placeholder="Seu WhatsApp (com DDD)"
-                className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-center text-xl font-black text-amber-500 tracking-widest outline-none focus:border-amber-500 transition-all"
-              />
+            <div className="space-y-5">
+              <div className="relative">
+                <input 
+                  type="tel"
+                  required
+                  autoFocus
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                  placeholder="(00) 00000-0000"
+                  className="w-full bg-slate-950 border-2 border-slate-800 p-5 rounded-2xl text-center text-xl font-black text-amber-500 tracking-widest outline-none focus:border-amber-500 transition-all placeholder:text-slate-800"
+                />
+              </div>
               <button 
                 type="submit"
-                className="w-full bg-amber-500 text-slate-950 font-black py-4 rounded-xl hover:bg-amber-400 transition-all uppercase tracking-widest text-sm shadow-lg shadow-amber-500/20"
+                className="w-full bg-amber-500 text-slate-950 font-black py-5 rounded-2xl hover:bg-amber-400 active:scale-[0.98] transition-all uppercase tracking-widest text-sm shadow-xl shadow-amber-500/10"
               >
-                Continuar
+                Acessar Agenda
               </button>
             </div>
           </form>
         ) : (
           <form onSubmit={handleRegister} className="text-center">
-            <h2 className="text-2xl font-black text-white uppercase tracking-tighter mb-2">Seja Bem-vindo!</h2>
-            <p className="text-slate-500 text-sm mb-8">Notamos que é sua primeira vez. Como gostaria de ser chamado?</p>
+            <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter mb-3">Quase lá!</h2>
+            <p className="text-slate-500 text-sm mb-8 px-4">Não encontramos seu nome. Como devemos te chamar na barbearia?</p>
             
-            <div className="space-y-4">
+            <div className="space-y-5">
               <input 
                 type="text"
                 required
                 autoFocus
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Seu Nome Completo"
-                className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-center text-lg font-bold text-slate-100 outline-none focus:border-amber-500 transition-all"
+                placeholder="Seu Nome e Sobrenome"
+                className="w-full bg-slate-950 border-2 border-slate-800 p-5 rounded-2xl text-center text-lg font-bold text-slate-100 outline-none focus:border-amber-500 transition-all placeholder:text-slate-800"
               />
               <button 
                 type="submit"
-                className="w-full bg-amber-500 text-slate-950 font-black py-4 rounded-xl hover:bg-amber-400 transition-all uppercase tracking-widest text-sm"
+                className="w-full bg-amber-500 text-slate-950 font-black py-5 rounded-2xl hover:bg-amber-400 active:scale-[0.98] transition-all uppercase tracking-widest text-sm shadow-xl shadow-amber-500/10"
               >
-                Finalizar Cadastro
+                Salvar e Continuar
               </button>
               <button 
                 type="button"
                 onClick={() => setStep('phone')}
-                className="text-slate-500 text-[10px] font-bold uppercase tracking-widest hover:text-slate-300 transition-colors"
+                className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] hover:text-slate-300 transition-colors pt-2"
               >
-                Voltar
+                Alterar Número
               </button>
             </div>
           </form>
