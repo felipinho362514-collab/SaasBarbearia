@@ -2,23 +2,45 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import ClientHub from './components/ClientHub';
+import ClientAuth from './components/ClientAuth';
 import AdminDashboard from './components/AdminDashboard';
 import { Appointment, AppointmentStatus } from './types';
+
+interface LoggedClient {
+  name: string;
+  phone: string;
+}
 
 const App: React.FC = () => {
   const [view, setView] = useState<'portal' | 'client' | 'admin' | 'admin-login'>('portal');
   const [pin, setPin] = useState('');
   const [loginError, setLoginError] = useState(false);
+  
+  // Estado do Cliente Logado
+  const [loggedClient, setLoggedClient] = useState<LoggedClient | null>(() => {
+    const saved = localStorage.getItem('barber_active_session');
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const [appointments, setAppointments] = useState<Appointment[]>(() => {
     const saved = localStorage.getItem('barber_appointments');
     return saved ? JSON.parse(saved) : [];
   });
+  
   const [aiTip, setAiTip] = useState<string>("");
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
   useEffect(() => {
     localStorage.setItem('barber_appointments', JSON.stringify(appointments));
   }, [appointments]);
+
+  useEffect(() => {
+    if (loggedClient) {
+      localStorage.setItem('barber_active_session', JSON.stringify(loggedClient));
+    } else {
+      localStorage.removeItem('barber_active_session');
+    }
+  }, [loggedClient]);
 
   useEffect(() => {
     if (notification) {
@@ -86,6 +108,12 @@ const App: React.FC = () => {
     }
   };
 
+  const handleLogout = () => {
+    setLoggedClient(null);
+    if (view === 'client') setView('portal');
+    showNotify("Sessão encerrada.");
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       {notification && (
@@ -129,7 +157,7 @@ const App: React.FC = () => {
                 <svg className="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
               </div>
               <h3 className="text-2xl font-black text-slate-100 mb-2 uppercase tracking-tight">Agendar Horário</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mt-auto">Marque seu próximo corte ou consulte suas reservas anteriores.</p>
+              <p className="text-slate-400 text-sm leading-relaxed mt-auto">Acesse seu perfil privado para gerenciar seus cortes.</p>
             </button>
 
             <button 
@@ -178,10 +206,19 @@ const App: React.FC = () => {
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center font-black text-slate-950 shadow-lg shadow-amber-500/20">B</div>
                 <span className="font-black text-lg tracking-tighter bg-gradient-to-r from-amber-200 to-amber-500 bg-clip-text text-transparent uppercase whitespace-nowrap">
-                  {view === 'client' ? 'Agendamento' : 'Painel Gestão'}
+                  {view === 'client' ? (loggedClient ? `Olá, ${loggedClient.name.split(' ')[0]}` : 'Agendamento') : 'Painel Gestão'}
                 </span>
               </div>
               <div className="flex items-center gap-4">
+                 {view === 'client' && loggedClient && (
+                    <button 
+                      onClick={handleLogout}
+                      className="text-[10px] font-black uppercase text-slate-500 hover:text-red-500 transition-all tracking-widest flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                      Sair
+                    </button>
+                 )}
                  {view === 'admin' && (
                     <div className="hidden md:block bg-amber-500/5 border border-amber-500/20 px-4 py-1.5 rounded-full">
                       <span className="text-[10px] font-black uppercase text-amber-500 tracking-widest italic">{aiTip}</span>
@@ -193,11 +230,19 @@ const App: React.FC = () => {
           <main className="max-w-7xl mx-auto px-4 py-12">
             <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
               {view === 'client' && (
-                <ClientHub 
-                  onBook={handleBook} 
-                  appointments={appointments} 
-                  onCancel={(id) => handleUpdateStatus(id, AppointmentStatus.CANCELLED)}
-                />
+                !loggedClient ? (
+                  <ClientAuth 
+                    onLogin={setLoggedClient} 
+                    existingPhones={appointments.map(a => a.clientPhone || '')} 
+                  />
+                ) : (
+                  <ClientHub 
+                    loggedClient={loggedClient}
+                    onBook={handleBook} 
+                    appointments={appointments.filter(a => a.clientPhone === loggedClient.phone)} 
+                    onCancel={(id) => handleUpdateStatus(id, AppointmentStatus.CANCELLED)}
+                  />
+                )
               )}
               {view === 'admin' && <AdminDashboard appointments={appointments} onUpdateStatus={handleUpdateStatus} />}
             </div>

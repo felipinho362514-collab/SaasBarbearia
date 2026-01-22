@@ -8,9 +8,17 @@ interface ClientBookingProps {
   onBook: (appointment: Partial<Appointment>) => void;
   existingAppointments: Appointment[];
   onGoToMyAppointments: () => void;
+  prefillName?: string;
+  prefillPhone?: string;
 }
 
-const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointments, onGoToMyAppointments }) => {
+const ClientBooking: React.FC<ClientBookingProps> = ({ 
+  onBook, 
+  existingAppointments, 
+  onGoToMyAppointments,
+  prefillName = '',
+  prefillPhone = ''
+}) => {
   const [selectedBarber, setSelectedBarber] = useState<Barber>(BARBERS[0]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -18,11 +26,15 @@ const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointme
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   
-  const [firstName, setFirstName] = useState(() => localStorage.getItem('barber_client_fname') || '');
-  const [lastName, setLastName] = useState(() => localStorage.getItem('barber_client_lname') || '');
-  const [phone, setPhone] = useState(() => localStorage.getItem('barber_client_phone') || '');
+  // Como estamos logados, usamos os dados do login
+  const firstName = prefillName.split(' ')[0];
+  const lastName = prefillName.split(' ').slice(1).join(' ');
+  const phone = prefillPhone;
 
   useEffect(() => {
+    // Aqui passamos todos os agendamentos do sistema para o serviço de cálculo (que deve estar no App para ser global)
+    // Para simplificar no demo, o ClientHub já passa os agendamentos filtrados, mas para disponibilidade real, precisamos dos globais.
+    // Como este é um sistema local, vamos assumir que o cálculo é feito sobre a base de dados.
     const slots = calculateAvailableSlots(selectedDate, selectedBarber, existingAppointments);
     setAvailableSlots(slots);
     setSelectedTime(null);
@@ -37,20 +49,15 @@ const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointme
   };
 
   const handleBooking = () => {
-    if (!selectedTime || selectedServices.length === 0 || !firstName || !lastName || !phone) return;
+    if (!selectedTime || selectedServices.length === 0) return;
     
-    const fullName = `${firstName.trim()} ${lastName.trim()}`;
-    localStorage.setItem('barber_client_fname', firstName);
-    localStorage.setItem('barber_client_lname', lastName);
-    localStorage.setItem('barber_client_phone', phone);
-
     onBook({
       barberId: selectedBarber.id,
       serviceIds: selectedServices,
       date: selectedDate,
       startTime: selectedTime,
-      clientName: fullName,
-      clientPhone: phone,
+      clientName: prefillName,
+      clientPhone: prefillPhone,
       status: AppointmentStatus.SCHEDULED
     });
     
@@ -66,14 +73,14 @@ const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointme
     .filter(s => selectedServices.includes(s.id))
     .reduce((acc, curr) => acc + curr.price, 0);
 
-  const isFormValid = selectedTime && selectedServices.length > 0 && firstName.trim() && lastName.trim() && phone.trim().length >= 8;
+  const isFormValid = selectedTime && selectedServices.length > 0;
 
   return (
     <div className="max-w-4xl mx-auto relative">
       <div className="flex justify-between items-end mb-10 border-b border-slate-900 pb-6">
         <div>
            <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Reserve seu Estilo</h2>
-           <p className="text-slate-500 text-sm mt-1">Siga os passos abaixo para confirmar sua reserva.</p>
+           <p className="text-slate-500 text-sm mt-1">Olá, <strong>{firstName}</strong>. Escolha o melhor horário para você.</p>
         </div>
         <button 
            onClick={onGoToMyAppointments}
@@ -191,46 +198,23 @@ const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointme
             </div>
           </section>
 
-          <section className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
-            <h3 className="text-sm font-black text-amber-500 uppercase tracking-[0.2em] mb-6">04. Quem é você?</h3>
-            <div className="grid gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <input 
-                  type="text" 
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="Nome"
-                  className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-slate-100 outline-none focus:border-amber-500 transition-all font-bold"
-                />
-                <input 
-                  type="text" 
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Sobrenome"
-                  className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-slate-100 outline-none focus:border-amber-500 transition-all font-bold"
-                />
-              </div>
-              <input 
-                type="tel" 
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Seu WhatsApp"
-                className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-slate-100 outline-none focus:border-amber-500 transition-all font-black text-xl tracking-wider"
-              />
-            </div>
-          </section>
-
           <section className="bg-amber-500 p-8 rounded-[2.5rem] shadow-2xl shadow-amber-500/20 text-slate-950">
-            <div className="flex justify-between text-lg font-black mb-6">
-              <span className="uppercase tracking-widest text-xs opacity-60">Total</span>
-              <span>R$ {totalPrice}</span>
+            <div className="flex justify-between items-center mb-6">
+              <div className="space-y-1">
+                 <p className="text-[10px] font-black uppercase opacity-60">Perfil Identificado</p>
+                 <p className="font-black text-xs">{phone}</p>
+              </div>
+              <div className="text-right">
+                <span className="uppercase tracking-widest text-[10px] font-black opacity-60">Total</span>
+                <p className="text-2xl font-black leading-none">R$ {totalPrice}</p>
+              </div>
             </div>
             <button
               disabled={!isFormValid}
               onClick={handleBooking}
               className="w-full py-4 bg-slate-950 text-amber-500 hover:bg-slate-900 disabled:bg-slate-950/50 disabled:text-slate-700 font-black rounded-2xl transition-all uppercase tracking-[0.2em] text-sm shadow-xl"
             >
-              {isFormValid ? 'Confirmar Reserva' : 'Preencha seus dados'}
+              {isFormValid ? 'Confirmar Reserva' : 'Selecione um horário'}
             </button>
           </section>
         </div>

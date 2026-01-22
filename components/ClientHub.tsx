@@ -5,12 +5,13 @@ import ClientMyAppointments from './ClientMyAppointments';
 import { Appointment } from '../types';
 
 interface ClientHubProps {
+  loggedClient: { name: string; phone: string };
   onBook: (appointment: Partial<Appointment>) => void;
   appointments: Appointment[];
   onCancel: (id: string) => void;
 }
 
-const ClientHub: React.FC<ClientHubProps> = ({ onBook, appointments, onCancel }) => {
+const ClientHub: React.FC<ClientHubProps> = ({ loggedClient, onBook, appointments, onCancel }) => {
   const [activeTab, setActiveTab] = useState<'booking' | 'my-appointments'>('booking');
 
   return (
@@ -35,7 +36,7 @@ const ClientHub: React.FC<ClientHubProps> = ({ onBook, appointments, onCancel })
               : 'text-slate-500 hover:text-slate-300'
           }`}
         >
-          Meus Horários
+          Meus Horários ({appointments.filter(a => a.status === 'SCHEDULED').length})
         </button>
       </div>
 
@@ -44,7 +45,9 @@ const ClientHub: React.FC<ClientHubProps> = ({ onBook, appointments, onCancel })
           <ClientBooking 
             onBook={onBook} 
             existingAppointments={appointments} 
-            onGoToMyAppointments={() => setActiveTab('my-appointments')} 
+            onGoToMyAppointments={() => setActiveTab('my-appointments')}
+            prefillName={loggedClient.name}
+            prefillPhone={loggedClient.phone}
           />
         ) : (
           <ClientMyAppointments 
