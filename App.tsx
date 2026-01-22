@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import ClientBooking from './components/ClientBooking';
@@ -11,19 +10,16 @@ const App: React.FC = () => {
   const [pin, setPin] = useState('');
   const [loginError, setLoginError] = useState(false);
   const [appointments, setAppointments] = useState<Appointment[]>(() => {
-    // Tenta carregar agendamentos do LocalStorage ao iniciar
     const saved = localStorage.getItem('barber_appointments');
     return saved ? JSON.parse(saved) : [];
   });
   const [aiTip, setAiTip] = useState<string>("");
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
-  // Salva no LocalStorage sempre que os agendamentos mudarem
   useEffect(() => {
     localStorage.setItem('barber_appointments', JSON.stringify(appointments));
   }, [appointments]);
 
-  // Limpa notificação após 3 segundos
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => setNotification(null), 3000);
@@ -35,15 +31,21 @@ const App: React.FC = () => {
     if (view === 'admin') {
       const fetchAiInsights = async () => {
         try {
-          // Fix: Always use process.env.API_KEY directly for GoogleGenAI initialization.
-          const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+          // Verificação de segurança para a API_KEY
+          const apiKey = process.env.API_KEY;
+          if (!apiKey) {
+             setAiTip("O segredo do estilo é a confiança total.");
+             return;
+          }
+
+          const ai = new GoogleGenAI({ apiKey });
           const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
             contents: "Gere uma frase curta de 'Dica do Mestre Barbeiro' sobre gestão ou estilo. Máximo 10 palavras.",
           });
-          // Fix: Access .text property directly instead of calling a method.
           setAiTip(response.text || "A excelência está no acabamento.");
         } catch (e) {
+          console.error("Erro na IA:", e);
           setAiTip("O segredo do estilo é a confiança total.");
         }
       };
@@ -92,7 +94,6 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
-      {/* Sistema de Notificação (Toast) */}
       {notification && (
         <div className={`fixed top-6 right-6 z-[100] px-6 py-4 rounded-2xl shadow-2xl border flex items-center gap-3 animate-in fade-in slide-in-from-right-8 duration-300 ${
           notification.type === 'success' ? 'bg-slate-900 border-green-500/50 text-green-400' : 'bg-slate-900 border-red-500/50 text-red-400'
@@ -102,7 +103,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Navegação/Voltar */}
       {view !== 'portal' && (
         <div className="fixed top-5 left-4 z-50">
           <button 
@@ -114,7 +114,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Renderização Condicional de Telas */}
       {view === 'portal' ? (
         <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
           <div className="mb-12">
@@ -187,20 +186,23 @@ const App: React.FC = () => {
               {loginError && <p className="text-red-500 text-xs font-bold">PIN Incorreto.</p>}
               <button className="w-full bg-amber-500 text-slate-950 font-black py-4 rounded-xl hover:bg-amber-400 transition-all uppercase tracking-widest text-xs">Entrar no Painel</button>
             </form>
-            <p className="mt-6 text-[10px] text-slate-600 font-bold uppercase italic tracking-widest">Dica: PIN é 2026</p>
           </div>
         </div>
       ) : (
         <>
           <nav className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-900 shadow-2xl h-20 flex items-center">
-            {/* Fix: Removed redundant view !== 'portal' check to resolve TypeScript "no overlap" error */}
-            <div className={`max-w-7xl mx-auto px-4 w-full flex justify-between items-center transition-all duration-300 pl-16`}>
+            <div className="max-w-7xl mx-auto px-4 w-full flex justify-between items-center transition-all duration-300 pl-16">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center font-black text-slate-950 shadow-lg shadow-amber-500/20">B</div>
                 <span className="font-black text-lg tracking-tighter bg-gradient-to-r from-amber-200 to-amber-500 bg-clip-text text-transparent uppercase whitespace-nowrap">
                   {view === 'client' ? 'Agendamento' : view === 'client-my-appointments' ? 'Meus Horários' : 'Painel Gestão'}
                 </span>
               </div>
+              {view === 'admin' && (
+                <div className="hidden md:block bg-amber-500/5 border border-amber-500/20 px-4 py-1.5 rounded-full">
+                  <span className="text-[10px] font-black uppercase text-amber-500 tracking-widest italic">{aiTip}</span>
+                </div>
+              )}
             </div>
           </nav>
           <main className="max-w-7xl mx-auto px-4 py-12">

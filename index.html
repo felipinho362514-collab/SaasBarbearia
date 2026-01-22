@@ -8,24 +8,59 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: #020617; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        #app-loader {
+            position: fixed; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; background: #020617; z-index: 1000;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid #1e293b;
+            border-top: 4px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
-<script type="importmap">
+    
+    <!-- Shim para evitar erro de 'process is not defined' no navegador -->
+    <script>
+        window.process = window.process || { env: { API_KEY: "" } };
+    </script>
+
+    <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "@google/genai": "https://esm.sh/@google/genai@1.38.0",
     "react/": "https://esm.sh/react@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.38.0"
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
   }
 }
 </script>
 </head>
 <body class="bg-slate-950 text-slate-100">
+    <div id="app-loader">
+        <div class="spinner"></div>
+        <p style="margin-top: 1rem; color: #94a3b8; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;">Carregando BarberFlow...</p>
+    </div>
     <div id="root"></div>
+    
+    <!-- Script para remover o loader após o React montar -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const observer = new MutationObserver((mutations) => {
+                if (document.querySelector('#root > *')) {
+                    document.getElementById('app-loader').style.display = 'none';
+                    observer.disconnect();
+                }
+            });
+            observer.observe(document.getElementById('root'), { childList: true });
+        });
+    </script>
 </body>
 </html>
