@@ -19,6 +19,9 @@ export interface Barber {
   id: string;
   name: string;
   avatar: string;
+  phone: string;
+  address: string;
+  operatingDays: string;
   specialties: string[];
   workingHours: {
     start: string; // "09:00"
@@ -33,7 +36,7 @@ export interface Appointment {
   barberId: string;
   clientId: string;
   clientName: string;
-  clientPhone?: string; // Novo campo opcional para WhatsApp
+  clientPhone?: string; 
   serviceIds: string[];
   date: string; // ISO string YYYY-MM-DD
   startTime: string; // HH:mm

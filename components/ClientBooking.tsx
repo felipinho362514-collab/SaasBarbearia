@@ -7,9 +7,10 @@ import { Barber, Service, TimeSlot, Appointment, AppointmentStatus } from '../ty
 interface ClientBookingProps {
   onBook: (appointment: Partial<Appointment>) => void;
   existingAppointments: Appointment[];
+  onGoToMyAppointments: () => void;
 }
 
-const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointments }) => {
+const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointments, onGoToMyAppointments }) => {
   const [selectedBarber, setSelectedBarber] = useState<Barber>(BARBERS[0]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -17,7 +18,6 @@ const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointme
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   
-  // Estados para identificação do cliente
   const [firstName, setFirstName] = useState(() => localStorage.getItem('barber_client_fname') || '');
   const [lastName, setLastName] = useState(() => localStorage.getItem('barber_client_lname') || '');
   const [phone, setPhone] = useState(() => localStorage.getItem('barber_client_phone') || '');
@@ -40,8 +40,6 @@ const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointme
     if (!selectedTime || selectedServices.length === 0 || !firstName || !lastName || !phone) return;
     
     const fullName = `${firstName.trim()} ${lastName.trim()}`;
-    
-    // Salva os dados para conveniência futura
     localStorage.setItem('barber_client_fname', firstName);
     localStorage.setItem('barber_client_lname', lastName);
     localStorage.setItem('barber_client_phone', phone);
@@ -57,8 +55,6 @@ const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointme
     });
     
     setShowSuccess(true);
-    
-    // Reset selections after success
     setTimeout(() => {
       setShowSuccess(false);
       setSelectedServices([]);
@@ -70,12 +66,24 @@ const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointme
     .filter(s => selectedServices.includes(s.id))
     .reduce((acc, curr) => acc + curr.price, 0);
 
-  // Validação agora inclui o telefone
   const isFormValid = selectedTime && selectedServices.length > 0 && firstName.trim() && lastName.trim() && phone.trim().length >= 8;
 
   return (
     <div className="max-w-4xl mx-auto relative">
-      {/* Modal de Sucesso */}
+      <div className="flex justify-between items-end mb-10 border-b border-slate-900 pb-6">
+        <div>
+           <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Reserve seu Estilo</h2>
+           <p className="text-slate-500 text-sm mt-1">Siga os passos abaixo para confirmar sua reserva.</p>
+        </div>
+        <button 
+           onClick={onGoToMyAppointments}
+           className="hidden md:flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 hover:text-amber-500 transition-colors tracking-widest"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+          Ver minhas reservas
+        </button>
+      </div>
+
       {showSuccess && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 animate-in fade-in duration-300">
           <div className="bg-slate-900 border border-amber-500/50 p-10 rounded-[2.5rem] text-center max-w-md shadow-2xl shadow-amber-500/20 animate-in zoom-in duration-500">
@@ -97,9 +105,7 @@ const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointme
       )}
 
       <div className="grid md:grid-cols-2 gap-8">
-        {/* Esquerda: Escolhas */}
         <div className="space-y-8">
-          {/* Escolha do Barbeiro */}
           <section className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
             <h3 className="text-sm font-black text-amber-500 uppercase tracking-[0.2em] mb-6">01. Escolha o Profissional</h3>
             <div className="flex gap-4">
@@ -125,7 +131,6 @@ const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointme
             </div>
           </section>
 
-          {/* Escolha dos Serviços */}
           <section className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
             <h3 className="text-sm font-black text-amber-500 uppercase tracking-[0.2em] mb-6">02. Selecione os Serviços</h3>
             <div className="grid gap-4">
@@ -155,7 +160,6 @@ const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointme
           </section>
         </div>
 
-        {/* Direita: Data e Confirmação */}
         <div className="space-y-8">
           <section className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
             <h3 className="text-sm font-black text-amber-500 uppercase tracking-[0.2em] mb-6">03. Quando?</h3>
@@ -187,84 +191,46 @@ const ClientBooking: React.FC<ClientBookingProps> = ({ onBook, existingAppointme
             </div>
           </section>
 
-          {/* Passo 04: Identificação do Cliente */}
           <section className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
             <h3 className="text-sm font-black text-amber-500 uppercase tracking-[0.2em] mb-6">04. Quem é você?</h3>
             <div className="grid gap-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1">Nome</label>
-                  <input 
-                    type="text" 
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Seu nome"
-                    className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-slate-100 outline-none focus:border-amber-500 transition-all font-bold"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1">Sobrenome</label>
-                  <input 
-                    type="text" 
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Seu sobrenome"
-                    className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-slate-100 outline-none focus:border-amber-500 transition-all font-bold"
-                  />
-                </div>
+                <input 
+                  type="text" 
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Nome"
+                  className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-slate-100 outline-none focus:border-amber-500 transition-all font-bold"
+                />
+                <input 
+                  type="text" 
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Sobrenome"
+                  className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-slate-100 outline-none focus:border-amber-500 transition-all font-bold"
+                />
               </div>
-              
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-slate-500 ml-1 flex items-center gap-2">
-                  WhatsApp 
-                  <span className="text-amber-500 text-[8px]">(Obrigatório)</span>
-                </label>
-                <div className="relative">
-                  <input 
-                    type="tel" 
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="(00) 00000-0000"
-                    className="w-full bg-slate-950 border border-slate-800 p-4 pl-12 rounded-xl text-slate-100 outline-none focus:border-amber-500 transition-all font-black text-xl tracking-wider"
-                  />
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-500">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.319 1.592 5.548 0 10.058-4.51 10.06-10.059.002-2.689-1.047-5.215-2.951-7.121C17.175 2.699 14.653 1.65 11.963 1.65c-5.549 0-10.059 4.51-10.06 10.06-.001 2.125.61 4.202 1.768 5.89l-.999 3.646 3.743-.982-.361-.221z"/>
-                    </svg>
-                  </div>
-                </div>
-              </div>
+              <input 
+                type="tel" 
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Seu WhatsApp"
+                className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-slate-100 outline-none focus:border-amber-500 transition-all font-black text-xl tracking-wider"
+              />
             </div>
           </section>
 
-          {/* Resumo e Botão */}
           <section className="bg-amber-500 p-8 rounded-[2.5rem] shadow-2xl shadow-amber-500/20 text-slate-950">
-            <h3 className="text-xs font-black uppercase tracking-widest mb-6 border-b border-slate-950/10 pb-4">Resumo da Reserva</h3>
-            <div className="space-y-3 mb-8">
-              <div className="flex justify-between text-sm font-bold">
-                <span className="opacity-60">Cliente:</span>
-                <span className="truncate max-w-[150px] font-black">{firstName ? `${firstName} ${lastName}` : '---'}</span>
-              </div>
-              <div className="flex justify-between text-base font-black border-y border-slate-950/5 py-2 my-2">
-                <span className="opacity-60">WhatsApp:</span>
-                <span className="tracking-tighter">{phone || '---'}</span>
-              </div>
-              <div className="flex justify-between text-sm font-bold">
-                <span className="opacity-60">Barbeiro:</span>
-                <span>{selectedBarber.name}</span>
-              </div>
-              <div className="flex justify-between text-lg font-black pt-4 border-t border-slate-950/10">
-                <span>TOTAL</span>
-                <span>R$ {totalPrice}</span>
-              </div>
+            <div className="flex justify-between text-lg font-black mb-6">
+              <span className="uppercase tracking-widest text-xs opacity-60">Total</span>
+              <span>R$ {totalPrice}</span>
             </div>
-            
             <button
               disabled={!isFormValid}
               onClick={handleBooking}
               className="w-full py-4 bg-slate-950 text-amber-500 hover:bg-slate-900 disabled:bg-slate-950/50 disabled:text-slate-700 font-black rounded-2xl transition-all uppercase tracking-[0.2em] text-sm shadow-xl"
             >
-              {isFormValid ? 'Finalizar Agendamento' : 'Preencha seus dados'}
+              {isFormValid ? 'Confirmar Reserva' : 'Preencha seus dados'}
             </button>
           </section>
         </div>

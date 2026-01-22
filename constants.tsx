@@ -6,6 +6,9 @@ export const BARBERS: Barber[] = [
     id: 'b1',
     name: 'Arthur "The Blade"',
     avatar: 'https://images.unsplash.com/photo-1503910361347-1c38167766c6?auto=format&fit=crop&q=80&w=200&h=200',
+    phone: '5511912345678',
+    address: 'Rua das Navalhas, 120 - Centro, São Paulo',
+    operatingDays: 'Segunda a Sexta',
     specialties: ['Corte Clássico', 'Barba Terapia'],
     workingHours: { start: '09:00', end: '19:00', breakStart: '12:00', breakEnd: '13:00' }
   },
@@ -13,6 +16,9 @@ export const BARBERS: Barber[] = [
     id: 'b2',
     name: 'Vitor "Fade Master"',
     avatar: 'https://images.unsplash.com/photo-1621605815841-aa887ad43617?auto=format&fit=crop&q=80&w=200&h=200',
+    phone: '5511998765432',
+    address: 'Av. do Degradê, 500 - Jardim América, São Paulo',
+    operatingDays: 'Terça a Sábado',
     specialties: ['Degradê Moderno', 'Platinado'],
     workingHours: { start: '10:00', end: '20:00', breakStart: '14:00', breakEnd: '15:00' }
   }

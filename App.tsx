@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import ClientBooking from './components/ClientBooking';
@@ -31,13 +32,11 @@ const App: React.FC = () => {
     if (view === 'admin') {
       const fetchAiInsights = async () => {
         try {
-          // Verificação de segurança para a API_KEY
           const apiKey = process.env.API_KEY;
           if (!apiKey) {
              setAiTip("O segredo do estilo é a confiança total.");
              return;
           }
-
           const ai = new GoogleGenAI({ apiKey });
           const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
@@ -73,10 +72,6 @@ const App: React.FC = () => {
     } else if (status === AppointmentStatus.COMPLETED) {
       showNotify("Serviço finalizado!", "success");
     }
-  };
-
-  const handleCancelAppointment = (id: string) => {
-    handleUpdateStatus(id, AppointmentStatus.CANCELLED);
   };
 
   const handleAdminLogin = (e: React.FormEvent) => {
@@ -123,41 +118,30 @@ const App: React.FC = () => {
               </svg>
             </div>
             <h1 className="text-4xl font-black text-slate-100 uppercase tracking-tighter mb-2">BarberFlow Pro</h1>
-            <p className="text-slate-500 font-medium">Selecione uma opção para continuar</p>
+            <p className="text-slate-500 font-medium italic">Sua melhor versão começa aqui</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
             <button 
               onClick={() => setView('client')}
-              className="group bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 p-8 rounded-3xl transition-all text-left shadow-xl h-full flex flex-col"
+              className="group bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 p-10 rounded-3xl transition-all text-left shadow-xl h-full flex flex-col"
             >
               <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <svg className="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
               </div>
-              <h3 className="text-xl font-bold text-slate-100 mb-2">Novo Agendamento</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mt-auto">Marque seu próximo horário com nossos especialistas.</p>
-            </button>
-
-            <button 
-              onClick={() => setView('client-my-appointments')}
-              className="group bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 p-8 rounded-3xl transition-all text-left shadow-xl h-full flex flex-col"
-            >
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              </div>
-              <h3 className="text-xl font-bold text-slate-100 mb-2">Meus Horários</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mt-auto">Consulte a data e o horário das suas reservas atuais.</p>
+              <h3 className="text-2xl font-black text-slate-100 mb-2 uppercase tracking-tight">Agendar Horário</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mt-auto">Marque seu próximo corte com nossos especialistas em poucos segundos.</p>
             </button>
 
             <button 
               onClick={() => setView('admin-login')}
-              className="group bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 p-8 rounded-3xl transition-all text-left shadow-xl h-full flex flex-col"
+              className="group bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 p-10 rounded-3xl transition-all text-left shadow-xl h-full flex flex-col"
             >
               <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <svg className="w-6 h-6 text-slate-400 group-hover:text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
               </div>
-              <h3 className="text-xl font-bold text-slate-100 mb-2">Painel Barbeiro</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mt-auto">Acesso restrito para gestão da equipe e faturamento.</p>
+              <h3 className="text-2xl font-black text-slate-100 mb-2 uppercase tracking-tight">Painel Gestão</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mt-auto">Acesso exclusivo para barbeiros gerenciarem faturamento e fila.</p>
             </button>
           </div>
         </div>
@@ -198,17 +182,27 @@ const App: React.FC = () => {
                   {view === 'client' ? 'Agendamento' : view === 'client-my-appointments' ? 'Meus Horários' : 'Painel Gestão'}
                 </span>
               </div>
-              {view === 'admin' && (
-                <div className="hidden md:block bg-amber-500/5 border border-amber-500/20 px-4 py-1.5 rounded-full">
-                  <span className="text-[10px] font-black uppercase text-amber-500 tracking-widest italic">{aiTip}</span>
-                </div>
-              )}
+              <div className="flex items-center gap-4">
+                 {view === 'client' && (
+                    <button 
+                      onClick={() => setView('client-my-appointments')}
+                      className="text-[10px] font-black uppercase text-amber-500 border border-amber-500/20 bg-amber-500/5 px-4 py-2 rounded-xl hover:bg-amber-500 hover:text-slate-950 transition-all tracking-widest"
+                    >
+                      Meus Agendamentos
+                    </button>
+                 )}
+                 {view === 'admin' && (
+                    <div className="hidden md:block bg-amber-500/5 border border-amber-500/20 px-4 py-1.5 rounded-full">
+                      <span className="text-[10px] font-black uppercase text-amber-500 tracking-widest italic">{aiTip}</span>
+                    </div>
+                 )}
+              </div>
             </div>
           </nav>
           <main className="max-w-7xl mx-auto px-4 py-12">
             <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-              {view === 'client' && <ClientBooking onBook={handleBook} existingAppointments={appointments} />}
-              {view === 'client-my-appointments' && <ClientMyAppointments appointments={appointments} onCancel={handleCancelAppointment} />}
+              {view === 'client' && <ClientBooking onBook={handleBook} existingAppointments={appointments} onGoToMyAppointments={() => setView('client-my-appointments')} />}
+              {view === 'client-my-appointments' && <ClientMyAppointments appointments={appointments} onCancel={(id) => setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: AppointmentStatus.CANCELLED } : a))} />}
               {view === 'admin' && <AdminDashboard appointments={appointments} onUpdateStatus={handleUpdateStatus} />}
             </div>
           </main>
