@@ -1,10 +1,12 @@
 
-import { Barber, Service } from './types';
+import { Barber, Service, UserRole } from './types';
 
 export const BARBERS: Barber[] = [
   {
     id: 'b1',
     name: 'Arthur "The Blade"',
+    // Adicionado role para cumprir a interface User herdada por Barber
+    role: UserRole.BARBER,
     avatar: 'https://images.unsplash.com/photo-1503910361347-1c38167766c6?auto=format&fit=crop&q=80&w=200&h=200',
     phone: '5511912345678',
     address: 'Rua das Navalhas, 120 - Centro, São Paulo',
@@ -15,6 +17,8 @@ export const BARBERS: Barber[] = [
   {
     id: 'b2',
     name: 'Vitor "Fade Master"',
+    // Adicionado role para cumprir a interface User herdada por Barber
+    role: UserRole.BARBER,
     avatar: 'https://images.unsplash.com/photo-1621605815841-aa887ad43617?auto=format&fit=crop&q=80&w=200&h=200',
     phone: '5511998765432',
     address: 'Av. do Degradê, 500 - Jardim América, São Paulo',

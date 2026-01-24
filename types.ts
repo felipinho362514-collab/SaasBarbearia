@@ -6,6 +6,23 @@ export enum AppointmentStatus {
   CANCELLED = 'CANCELLED'
 }
 
+export enum UserRole {
+  CLIENT = 'CLIENT',
+  BARBER = 'BARBER'
+}
+
+export interface User {
+  id: string;
+  name: string;
+  phone?: string;
+  email?: string;
+  role: UserRole;
+  avatar?: string;
+  // Específico para barbeiro
+  pin?: string; 
+  services?: string[]; // IDs dos serviços que ele realiza
+}
+
 export interface Service {
   id: string;
   name: string;
@@ -15,20 +32,16 @@ export interface Service {
   image: string;
 }
 
-export interface Barber {
-  id: string;
-  name: string;
-  avatar: string;
-  phone: string;
-  address: string;
-  operatingDays: string;
+export interface Barber extends User {
   specialties: string[];
   workingHours: {
-    start: string; // "09:00"
-    end: string;   // "19:00"
+    start: string;
+    end: string;
     breakStart: string;
     breakEnd: string;
   };
+  address: string;
+  operatingDays: string;
 }
 
 export interface Appointment {
@@ -36,11 +49,10 @@ export interface Appointment {
   barberId: string;
   clientId: string;
   clientName: string;
-  clientPhone?: string; 
+  clientPhone: string;
   serviceIds: string[];
-  date: string; // ISO string YYYY-MM-DD
+  date: string; // YYYY-MM-DD
   startTime: string; // HH:mm
-  endTime: string; // HH:mm
   status: AppointmentStatus;
 }
 
