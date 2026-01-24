@@ -12,6 +12,13 @@ interface ClientBookingProps {
   prefillPhone?: string;
 }
 
+const getLocalDate = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const ClientBooking: React.FC<ClientBookingProps> = ({ 
   onBook, 
   existingAppointments, 
@@ -19,9 +26,10 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
   prefillName = '',
   prefillPhone = ''
 }) => {
+  const todayStr = getLocalDate();
   const [selectedBarber, setSelectedBarber] = useState<Barber>(BARBERS[0]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState<string>(todayStr);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -35,7 +43,7 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
     for (let i = 0; i < 14; i++) {
       const date = new Date();
       date.setDate(now.getDate() + i);
-      const isoDate = date.toISOString().split('T')[0];
+      const isoDate = getLocalDate(date);
       const dayName = date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
       const dayNumber = date.getDate();
       days.push({ isoDate, dayName, dayNumber, isToday: i === 0 });
@@ -80,7 +88,6 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 transform-gpu">
-      {/* Botão de Histórico */}
       <div className="flex justify-end mb-6">
         <button 
            onClick={onGoToMyAppointments}
@@ -92,8 +99,6 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
       </div>
 
       <div className="space-y-10 pb-48">
-        
-        {/* 01. CAROUSEL DE CORTES (O CORAÇÃO DO VISUAL) */}
         <section className="bg-slate-900/20 rounded-[3rem] py-6">
           <div className="px-6 mb-6">
             <h3 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em]">Escolha seu Estilo</h3>
@@ -111,13 +116,11 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
               >
                 <img src={service.image} className="absolute inset-0 w-full h-full object-cover" alt={service.name} />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
-                
                 {selectedServices.includes(service.id) && (
                   <div className="absolute top-4 right-4 bg-amber-500 text-slate-950 p-2 rounded-full shadow-lg">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
                   </div>
                 )}
-
                 <div className="absolute bottom-6 left-6 right-6">
                   <span className="bg-amber-500 text-slate-950 px-3 py-1 rounded-lg text-[9px] font-black uppercase mb-2 inline-block">
                     R$ {service.price}
@@ -130,7 +133,6 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
           </div>
         </section>
 
-        {/* 02. PROFISSIONAIS (GRID COMPACTO) */}
         <section className="bg-slate-900/40 p-6 rounded-[2.5rem] border border-slate-800/50">
           <h3 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] mb-6">Mãos de Mestre</h3>
           <div className="grid grid-cols-2 gap-4">
@@ -152,7 +154,6 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
           </div>
         </section>
 
-        {/* 03. Data e Horário */}
         <section className="bg-slate-900/40 p-6 rounded-[2.5rem] border border-slate-800/50">
           <h3 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] mb-6">Qual o melhor momento?</h3>
           <div className="flex gap-3 overflow-x-auto pb-6 no-scrollbar snap-x">
@@ -188,7 +189,6 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
         </section>
       </div>
 
-      {/* BARRA DE FINALIZAÇÃO FIXA */}
       <div className="fixed bottom-0 left-0 right-0 z-[60] transform-gpu">
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/98 to-transparent h-48 -top-28 pointer-events-none" />
         <div className="p-5 relative pb-10">
@@ -215,7 +215,6 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
         </div>
       </div>
 
-      {/* Sucesso Animado */}
       {showSuccess && (
         <div className="fixed inset-0 z-[100] flex items-end justify-center bg-slate-950/90 backdrop-blur-md p-6 animate-in fade-in duration-300">
           <div className="bg-slate-900 border border-amber-500/20 p-10 rounded-[3.5rem] text-center w-full max-w-sm mb-12 shadow-2xl animate-in slide-in-from-bottom-20 duration-500">

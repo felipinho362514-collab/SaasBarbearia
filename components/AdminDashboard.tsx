@@ -1,30 +1,38 @@
 
 import React, { useMemo, useState } from 'react';
 import { Appointment, AppointmentStatus } from '../types';
-import { SERVICES, BARBERS } from '../constants';
+import { SERVICES } from '../constants';
 
 interface AdminDashboardProps {
   appointments: Appointment[];
   onUpdateStatus: (id: string, status: AppointmentStatus) => void;
 }
 
+// Helper para data local YYYY-MM-DD
+const getLocalDate = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ appointments, onUpdateStatus }) => {
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const todayStr = getLocalDate();
+  const [selectedDate, setSelectedDate] = useState<string>(todayStr);
 
   const weekDays = useMemo(() => {
     const days = [];
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
-    for (let i = -2; i < 12; i++) { // Mostra 2 dias passados e 12 futuros
+    for (let i = -2; i < 12; i++) {
       const date = new Date();
       date.setDate(now.getDate() + i);
-      const isoDate = date.toISOString().split('T')[0];
+      const isoDate = getLocalDate(date);
       const dayName = date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
       const dayNumber = date.getDate();
       days.push({ isoDate, dayName, dayNumber, isToday: isoDate === todayStr });
     }
     return days;
-  }, []);
+  }, [todayStr]);
 
   const { stats, dayAppointments } = useMemo(() => {
     let total = 0;
@@ -48,12 +56,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ appointments, onUpdateS
     };
   }, [appointments, selectedDate]);
 
-  const isToday = selectedDate === new Date().toISOString().split('T')[0];
+  const isToday = selectedDate === todayStr;
 
   return (
     <div className="space-y-8 pb-24 animate-in fade-in duration-500">
-      {/* Header de Gestão */}
-      <section className="px-2">
+      <section className="px-2 pt-6">
         <div className="flex justify-between items-end mb-6">
           <div>
             <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Painel do Mestre</h2>
@@ -64,7 +71,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ appointments, onUpdateS
           </div>
         </div>
 
-        {/* Mini Dash de Performance */}
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl shadow-xl">
             <span className="block text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Agendados</span>
@@ -81,13 +87,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ appointments, onUpdateS
         </div>
       </section>
 
-      {/* Seletor de Escala (Strip Tátil) */}
       <section className="bg-slate-900/50 border-y border-slate-800/50 py-6">
         <div className="flex justify-between items-center mb-4 px-6">
           <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Escala Semanal</h3>
           {!isToday && (
             <button 
-              onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])} 
+              onClick={() => setSelectedDate(todayStr)} 
               className="bg-amber-500/10 text-amber-500 text-[9px] font-black uppercase px-3 py-1 rounded-full border border-amber-500/20 active:scale-90 transition-all"
             >
               Voltar para Hoje
@@ -117,12 +122,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ appointments, onUpdateS
         </div>
       </section>
 
-      {/* Feed de Atendimentos */}
       <section className="px-4 space-y-4">
         <div className="flex items-center gap-2 mb-2 px-2">
            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
            <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-             {isToday ? 'Atendimentos de Hoje' : `Agenda para ${new Date(selectedDate).toLocaleDateString('pt-BR')}`}
+             {isToday ? 'Atendimentos de Hoje' : `Agenda para ${new Date(selectedDate + 'T12:00:00').toLocaleDateString('pt-BR')}`}
            </h4>
         </div>
 

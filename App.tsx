@@ -5,11 +5,11 @@ import ClientHub from './components/ClientHub';
 import ClientAuth from './components/ClientAuth';
 import AdminDashboard from './components/AdminDashboard';
 import BarberAuth from './components/BarberAuth';
+import { BARBERS } from './constants';
 
 const App: React.FC = () => {
   const [view, setView] = useState<'portal' | 'client' | 'barber'>('portal');
   
-  // Estados de Autenticação
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('barberflow_user');
     return saved ? JSON.parse(saved) : null;
@@ -21,6 +21,14 @@ const App: React.FC = () => {
   });
 
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
+
+  // Sincroniza barbeiros iniciais se o DB estiver vazio
+  useEffect(() => {
+    const users = JSON.parse(localStorage.getItem('barberflow_users_db') || '[]');
+    if (users.length === 0) {
+      localStorage.setItem('barberflow_users_db', JSON.stringify(BARBERS));
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('barberflow_appointments', JSON.stringify(appointments));
@@ -59,7 +67,6 @@ const App: React.FC = () => {
     showNotify("Status atualizado");
   };
 
-  // Redirecionamento automático se já estiver logado
   useEffect(() => {
     if (currentUser && view === 'portal') {
       setView(currentUser.role === UserRole.CLIENT ? 'client' : 'barber');

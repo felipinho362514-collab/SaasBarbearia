@@ -5,10 +5,11 @@ export const BARBERS: Barber[] = [
   {
     id: 'b1',
     name: 'Arthur "The Blade"',
-    // Adicionado role para cumprir a interface User herdada por Barber
     role: UserRole.BARBER,
     avatar: 'https://images.unsplash.com/photo-1503910361347-1c38167766c6?auto=format&fit=crop&q=80&w=200&h=200',
     phone: '5511912345678',
+    email: 'arthur@barber.com',
+    pin: '1234',
     address: 'Rua das Navalhas, 120 - Centro, São Paulo',
     operatingDays: 'Segunda a Sexta',
     specialties: ['Corte Clássico', 'Barba Terapia'],
@@ -17,10 +18,11 @@ export const BARBERS: Barber[] = [
   {
     id: 'b2',
     name: 'Vitor "Fade Master"',
-    // Adicionado role para cumprir a interface User herdada por Barber
     role: UserRole.BARBER,
     avatar: 'https://images.unsplash.com/photo-1621605815841-aa887ad43617?auto=format&fit=crop&q=80&w=200&h=200',
     phone: '5511998765432',
+    email: 'vitor@barber.com',
+    pin: '1234',
     address: 'Av. do Degradê, 500 - Jardim América, São Paulo',
     operatingDays: 'Terça a Sábado',
     specialties: ['Degradê Moderno', 'Platinado'],
@@ -55,4 +57,4 @@ export const SERVICES: Service[] = [
   }
 ];
 
-export const SLOT_INTERVAL = 30; // minutos
+export const SLOT_INTERVAL = 30;
