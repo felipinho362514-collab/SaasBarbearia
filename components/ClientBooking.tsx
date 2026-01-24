@@ -24,8 +24,6 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
-  
-  const firstName = prefillName.split(' ')[0];
 
   const availableSlots = useMemo(() => {
     return calculateAvailableSlots(selectedDate, selectedBarber, existingAppointments);
@@ -93,53 +91,63 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
         </button>
       </div>
 
-      <div className="space-y-8 pb-48"> {/* Espaço extra no final para não conflitar com a barra fixa */}
+      <div className="space-y-10 pb-48">
         
-        {/* 01. Profissional */}
-        <section className="bg-slate-900/40 p-6 rounded-[2.5rem] border border-slate-800/50">
-          <h3 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] mb-6">Quem vai te atender?</h3>
-          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-            {BARBERS.map(barber => (
-              <button
-                key={barber.id}
-                onClick={() => { setSelectedBarber(barber); setSelectedTime(null); }}
-                className={`flex flex-col items-center gap-3 min-w-[130px] p-5 rounded-[2rem] border-2 transition-all duration-200 active:scale-95 ${
-                  selectedBarber.id === barber.id ? 'border-amber-500 bg-amber-500/5' : 'border-slate-800 bg-slate-950'
+        {/* 01. CAROUSEL DE CORTES (O CORAÇÃO DO VISUAL) */}
+        <section className="bg-slate-900/20 rounded-[3rem] py-6">
+          <div className="px-6 mb-6">
+            <h3 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em]">Escolha seu Estilo</h3>
+            <p className="text-slate-500 text-[9px] font-bold uppercase mt-1">Toque para selecionar um ou mais</p>
+          </div>
+          
+          <div className="flex gap-4 overflow-x-auto no-scrollbar px-6 snap-x pb-4">
+            {SERVICES.map(service => (
+              <div
+                key={service.id}
+                onClick={() => toggleService(service.id)}
+                className={`flex-shrink-0 w-64 h-80 rounded-[2.5rem] relative overflow-hidden snap-center cursor-pointer transition-all duration-300 border-2 ${
+                  selectedServices.includes(service.id) ? 'border-amber-500 scale-105 shadow-2xl shadow-amber-500/20' : 'border-slate-800 grayscale-[0.5]'
                 }`}
               >
-                <img src={barber.avatar} className="w-16 h-16 rounded-full border-2 border-slate-800" alt="" />
-                <span className="text-[10px] font-black text-slate-200 uppercase tracking-widest">{barber.name.split(' ')[0]}</span>
-              </button>
+                <img src={service.image} className="absolute inset-0 w-full h-full object-cover" alt={service.name} />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                
+                {selectedServices.includes(service.id) && (
+                  <div className="absolute top-4 right-4 bg-amber-500 text-slate-950 p-2 rounded-full shadow-lg">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                  </div>
+                )}
+
+                <div className="absolute bottom-6 left-6 right-6">
+                  <span className="bg-amber-500 text-slate-950 px-3 py-1 rounded-lg text-[9px] font-black uppercase mb-2 inline-block">
+                    R$ {service.price}
+                  </span>
+                  <h4 className="text-white font-black text-lg uppercase tracking-tight leading-none mb-1">{service.name}</h4>
+                  <p className="text-slate-400 text-[9px] font-bold uppercase tracking-wider">{service.durationMinutes} min</p>
+                </div>
+              </div>
             ))}
           </div>
         </section>
 
-        {/* 02. Serviços */}
+        {/* 02. PROFISSIONAIS (GRID COMPACTO) */}
         <section className="bg-slate-900/40 p-6 rounded-[2.5rem] border border-slate-800/50">
-          <h3 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] mb-6">Escolha os Serviços</h3>
-          <div className="grid gap-3">
-            {SERVICES.map(service => (
-              <div 
-                key={service.id}
-                onClick={() => toggleService(service.id)}
-                className={`flex items-center p-4 rounded-3xl border-2 cursor-pointer transition-all duration-200 active:scale-[0.98] ${
-                  selectedServices.includes(service.id) ? 'border-amber-500 bg-amber-500/5' : 'border-slate-800 bg-slate-950'
+          <h3 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] mb-6">Mãos de Mestre</h3>
+          <div className="grid grid-cols-2 gap-4">
+            {BARBERS.map(barber => (
+              <button
+                key={barber.id}
+                onClick={() => { setSelectedBarber(barber); setSelectedTime(null); }}
+                className={`flex items-center gap-4 p-4 rounded-[2rem] border-2 transition-all duration-200 active:scale-95 ${
+                  selectedBarber.id === barber.id ? 'border-amber-500 bg-amber-500/5' : 'border-slate-800 bg-slate-950'
                 }`}
               >
-                <div className="w-14 h-14 rounded-2xl overflow-hidden grayscale group-active:grayscale-0 shrink-0">
-                  <img src={service.image} className="w-full h-full object-cover" alt="" />
+                <img src={barber.avatar} className="w-12 h-12 rounded-full border-2 border-slate-800" alt="" />
+                <div className="text-left">
+                  <span className="block text-[10px] font-black text-slate-200 uppercase tracking-tight">{barber.name.split(' ')[0]}</span>
+                  <span className="block text-[8px] text-slate-500 font-bold uppercase">{barber.operatingDays.split(' ')[0]}</span>
                 </div>
-                <div className="ml-5 flex-1">
-                  <div className="flex justify-between items-center">
-                    <span className="font-black text-slate-100 text-[13px] uppercase tracking-tight">{service.name}</span>
-                    <span className="text-amber-500 font-black text-[13px]">R$ {service.price}</span>
-                  </div>
-                  <p className="text-[9px] text-slate-500 font-bold uppercase tracking-tighter mt-1">{service.durationMinutes} minutos de cuidado</p>
-                </div>
-                <div className={`ml-4 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selectedServices.includes(service.id) ? 'bg-amber-500 border-amber-500' : 'border-slate-800'}`}>
-                  {selectedServices.includes(service.id) && <svg className="w-3.5 h-3.5 text-slate-950" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>}
-                </div>
-              </div>
+              </button>
             ))}
           </div>
         </section>
@@ -180,8 +188,8 @@ const ClientBooking: React.FC<ClientBookingProps> = ({
         </section>
       </div>
 
-      {/* BARRA DE FINALIZAÇÃO FIXA - ESTRUTURA REFORÇADA */}
-      <div className="fixed bottom-0 left-0 right-0 z-[60] transform-gpu will-change-transform translate-z-0">
+      {/* BARRA DE FINALIZAÇÃO FIXA */}
+      <div className="fixed bottom-0 left-0 right-0 z-[60] transform-gpu">
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/98 to-transparent h-48 -top-28 pointer-events-none" />
         <div className="p-5 relative pb-10">
           <div className={`bg-amber-500 p-5 rounded-[2.5rem] shadow-2xl flex items-center justify-between transition-all duration-500 ${isFormValid ? 'scale-100' : 'scale-[0.98] opacity-95'}`}>
