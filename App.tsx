@@ -16,7 +16,6 @@ const App: React.FC = () => {
   const [pin, setPin] = useState('');
   const [loginError, setLoginError] = useState(false);
   
-  // Estado do Cliente Logado
   const [loggedClient, setLoggedClient] = useState<LoggedClient | null>(() => {
     const saved = localStorage.getItem('barber_active_session');
     return saved ? JSON.parse(saved) : null;
@@ -83,15 +82,15 @@ const App: React.FC = () => {
       id: Math.random().toString(36).substr(2, 9),
     };
     setAppointments(prev => [...prev, app]);
-    showNotify("Agendamento realizado com sucesso!");
+    showNotify("Agendamento realizado!");
   };
 
   const handleUpdateStatus = (id: string, status: AppointmentStatus) => {
     setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a));
     if (status === AppointmentStatus.CANCELLED) {
-      showNotify("Reserva cancelada.", "success");
+      showNotify("Cancelado.", "success");
     } else if (status === AppointmentStatus.COMPLETED) {
-      showNotify("Serviço finalizado!", "success");
+      showNotify("Finalizado!", "success");
     }
   };
 
@@ -101,7 +100,7 @@ const App: React.FC = () => {
       setView('admin');
       setLoginError(false);
       setPin('');
-      showNotify("Bem-vindo de volta, mestre!");
+      showNotify("Olá, Mestre!");
     } else {
       setLoginError(true);
       setPin('');
@@ -111,17 +110,17 @@ const App: React.FC = () => {
   const handleLogout = () => {
     setLoggedClient(null);
     if (view === 'client') setView('portal');
-    showNotify("Sessão encerrada.");
+    showNotify("Até breve!");
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
       {notification && (
-        <div className={`fixed top-6 right-6 z-[100] px-6 py-4 rounded-2xl shadow-2xl border flex items-center gap-3 animate-in fade-in slide-in-from-right-8 duration-300 ${
+        <div className={`fixed top-4 left-4 right-4 z-[200] px-6 py-4 rounded-2xl shadow-2xl border flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${
           notification.type === 'success' ? 'bg-slate-900 border-green-500/50 text-green-400' : 'bg-slate-900 border-red-500/50 text-red-400'
         }`}>
           <div className={`w-2 h-2 rounded-full ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
-          <span className="text-sm font-black uppercase tracking-widest">{notification.message}</span>
+          <span className="text-[10px] font-black uppercase tracking-widest">{notification.message}</span>
         </div>
       )}
 
@@ -129,126 +128,62 @@ const App: React.FC = () => {
         <div className="fixed top-5 left-4 z-50">
           <button 
             onClick={() => setView('portal')}
-            className="bg-slate-900/80 hover:bg-slate-800 backdrop-blur-md p-2.5 rounded-full border border-slate-800 text-slate-400 hover:text-white transition-all shadow-xl hover:scale-105 active:scale-95"
+            className="bg-slate-900/80 backdrop-blur-md p-2 rounded-full border border-slate-800 text-slate-400 active:scale-95 shadow-xl"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
           </button>
         </div>
       )}
 
       {view === 'portal' ? (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
           <div className="mb-12">
-            <div className="w-20 h-20 bg-amber-500 rounded-2xl flex items-center justify-center shadow-2xl shadow-amber-500/20 mx-auto mb-6 rotate-3">
-              <svg className="w-12 h-12 text-slate-950" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M19.38 8.01c.21-.21.21-.55 0-.76L17.75 5.6c-.21-.21-.55-.21-.76 0l-1.07 1.07c-1.12-.76-2.48-1.21-3.92-1.21-3.87 0-7 3.13-7 7 0 1.44.45 2.8 1.21 3.92l-1.07 1.07c-.21.21-.21.55 0 .76l1.63 1.63c.21.21.55.21.76 0l1.07-1.07c1.12.76 2.48 1.21 3.92 1.21 3.87 0 7-3.13 7-7 0-1.44-.45-2.8-1.21-3.92l1.07-1.07zM12 15c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
-              </svg>
+            <div className="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center shadow-2xl shadow-amber-500/20 mx-auto mb-6">
+               <svg className="w-10 h-10 text-slate-950" fill="currentColor" viewBox="0 0 24 24"><path d="M19.38 8.01c.21-.21.21-.55 0-.76L17.75 5.6c-.21-.21-.55-.21-.76 0l-1.07 1.07c-1.12-.76-2.48-1.21-3.92-1.21-3.87 0-7 3.13-7 7 0 1.44.45 2.8 1.21 3.92l-1.07 1.07c-.21.21-.21.55 0 .76l1.63 1.63c.21.21.55.21.76 0l1.07-1.07c1.12.76 2.48 1.21 3.92 1.21 3.87 0 7-3.13 7-7 0-1.44-.45-2.8-1.21-3.92l1.07-1.07zM12 15c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
             </div>
-            <h1 className="text-4xl font-black text-slate-100 uppercase tracking-tighter mb-2">BarberFlow Pro</h1>
-            <p className="text-slate-500 font-medium italic">Sua melhor versão começa aqui</p>
+            <h1 className="text-3xl font-black text-slate-100 uppercase tracking-tighter mb-1">BarberFlow Pro</h1>
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest opacity-60">Mobile Experience</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
-            <button 
-              onClick={() => setView('client')}
-              className="group bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 p-10 rounded-3xl transition-all text-left shadow-xl h-full flex flex-col"
-            >
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-              </div>
-              <h3 className="text-2xl font-black text-slate-100 mb-2 uppercase tracking-tight">Agendar Horário</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mt-auto">Acesse seu perfil privado para gerenciar seus cortes.</p>
-            </button>
-
-            <button 
-              onClick={() => setView('admin-login')}
-              className="group bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 p-10 rounded-3xl transition-all text-left shadow-xl h-full flex flex-col"
-            >
-              <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6 text-slate-400 group-hover:text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-              </div>
-              <h3 className="text-2xl font-black text-slate-100 mb-2 uppercase tracking-tight">Painel Gestão</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mt-auto">Acesso exclusivo para barbeiros gerenciarem faturamento e fila.</p>
-            </button>
-          </div>
-        </div>
-      ) : view === 'admin-login' ? (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 p-8 rounded-[2rem] shadow-2xl text-center">
-            <button onClick={() => setView('portal')} className="text-slate-500 hover:text-white text-xs font-bold uppercase tracking-widest mb-8 flex items-center gap-2 mx-auto">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-              Voltar
-            </button>
-            <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-            </div>
-            <h2 className="text-2xl font-black text-white mb-2 uppercase tracking-tighter">Acesso Restrito</h2>
-            <p className="text-slate-500 text-sm mb-8">Digite o PIN para acessar o painel administrativo.</p>
-            <form onSubmit={handleAdminLogin} className="space-y-4">
-              <input 
-                type="password" 
-                value={pin}
-                onChange={(e) => setPin(e.target.value)}
-                placeholder="••••"
-                className={`w-full bg-slate-950 border ${loginError ? 'border-red-500' : 'border-slate-800'} p-4 rounded-xl text-center text-3xl tracking-[1em] text-amber-500 outline-none focus:border-amber-500 transition-all`}
-                maxLength={4}
-                autoFocus
-              />
-              {loginError && <p className="text-red-500 text-xs font-bold">PIN Incorreto.</p>}
-              <button className="w-full bg-amber-500 text-slate-950 font-black py-4 rounded-xl hover:bg-amber-400 transition-all uppercase tracking-widest text-xs">Entrar no Painel</button>
-            </form>
+          <div className="flex flex-col gap-4 w-full max-w-xs">
+            <button onClick={() => setView('client')} className="bg-amber-500 text-slate-950 p-6 rounded-3xl font-black uppercase tracking-widest text-xs active:scale-95 transition-all shadow-xl shadow-amber-500/10">Novo Agendamento</button>
+            <button onClick={() => setView('admin-login')} className="bg-slate-900 border border-slate-800 text-slate-400 p-6 rounded-3xl font-black uppercase tracking-widest text-xs active:scale-95 transition-all">Acesso Gestão</button>
           </div>
         </div>
       ) : (
         <>
-          <nav className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-900 shadow-2xl h-20 flex items-center">
-            <div className="max-w-7xl mx-auto px-4 w-full flex justify-between items-center transition-all duration-300 pl-16">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center font-black text-slate-950 shadow-lg shadow-amber-500/20">B</div>
-                <span className="font-black text-lg tracking-tighter bg-gradient-to-r from-amber-200 to-amber-500 bg-clip-text text-transparent uppercase whitespace-nowrap">
-                  {view === 'client' ? (loggedClient ? `Olá, ${loggedClient.name.split(' ')[0]}` : 'Agendamento') : 'Painel Gestão'}
+          <nav className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-900 h-16 flex items-center px-4 pl-14">
+             <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-amber-500 rounded flex items-center justify-center font-black text-slate-950 text-[10px]">B</div>
+                <span className="font-black text-sm uppercase tracking-tighter">
+                  {view === 'client' ? (loggedClient ? `Olá, ${loggedClient.name.split(' ')[0]}` : 'Entrar') : 'Painel'}
                 </span>
-              </div>
-              <div className="flex items-center gap-4">
-                 {view === 'client' && loggedClient && (
-                    <button 
-                      onClick={handleLogout}
-                      className="text-[10px] font-black uppercase text-slate-500 hover:text-red-500 transition-all tracking-widest flex items-center gap-2"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                      Sair
-                    </button>
-                 )}
-                 {view === 'admin' && (
-                    <div className="hidden md:block bg-amber-500/5 border border-amber-500/20 px-4 py-1.5 rounded-full">
-                      <span className="text-[10px] font-black uppercase text-amber-500 tracking-widest italic">{aiTip}</span>
-                    </div>
-                 )}
-              </div>
-            </div>
+             </div>
+             {view === 'client' && loggedClient && (
+               <button onClick={handleLogout} className="ml-auto text-[8px] font-black uppercase text-slate-500 tracking-widest">Sair</button>
+             )}
           </nav>
-          <main className="max-w-7xl mx-auto px-4 py-12">
-            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-              {view === 'client' && (
-                !loggedClient ? (
-                  <ClientAuth 
-                    onLogin={setLoggedClient} 
-                    existingPhones={appointments.map(a => a.clientPhone || '')} 
-                  />
-                ) : (
-                  <ClientHub 
-                    loggedClient={loggedClient}
-                    onBook={handleBook} 
-                    appointments={appointments.filter(a => a.clientPhone === loggedClient.phone)} 
-                    onCancel={(id) => handleUpdateStatus(id, AppointmentStatus.CANCELLED)}
-                  />
-                )
-              )}
-              {view === 'admin' && <AdminDashboard appointments={appointments} onUpdateStatus={handleUpdateStatus} />}
-            </div>
+          <main className="flex-1 overflow-y-auto px-4 py-6 custom-scrollbar">
+             {view === 'admin-login' ? (
+               <div className="flex items-center justify-center min-h-[60vh]">
+                 <form onSubmit={handleAdminLogin} className="w-full max-w-xs space-y-4">
+                    <input type="password" value={pin} onChange={(e) => setPin(e.target.value)} placeholder="PIN 4 DÍGITOS" className="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl text-center text-2xl font-black text-amber-500 outline-none focus:border-amber-500" maxLength={4} autoFocus />
+                    <button className="w-full bg-amber-500 text-slate-950 font-black py-4 rounded-xl text-[10px] uppercase tracking-widest">Acessar</button>
+                 </form>
+               </div>
+             ) : (
+               <div className="animate-in fade-in duration-500">
+                 {view === 'client' && (
+                   !loggedClient ? <ClientAuth onLogin={setLoggedClient} existingPhones={appointments.map(a => a.clientPhone || '')} /> : 
+                   <ClientHub loggedClient={loggedClient} onBook={handleBook} appointments={appointments.filter(a => a.clientPhone === loggedClient.phone)} onCancel={(id) => handleUpdateStatus(id, AppointmentStatus.CANCELLED)} />
+                 )}
+                 {view === 'admin' && <AdminDashboard appointments={appointments} onUpdateStatus={handleUpdateStatus} />}
+               </div>
+             )}
           </main>
         </>
       )}
+      <style>{`.custom-scrollbar::-webkit-scrollbar { width: 0px; }`}</style>
     </div>
   );
 };
